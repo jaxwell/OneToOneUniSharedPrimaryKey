@@ -1,0 +1,39 @@
+package net.bykov.hibernate;
+
+import java.util.List;
+
+import net.bykov.hibernate.model.Address;
+import net.bykov.hibernate.model.Student;
+import org.hibernate.Session;
+
+
+public class HibernateStandAlone {
+
+    @SuppressWarnings("unchecked")
+    public static void main(String[] args) {
+
+        Student student = new Student("Sam", "Disilva", "Maths");
+        Address address = new Address("10 Silver street", "NYC", "USA");
+
+
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        session.beginTransaction();
+
+        session.persist(student);
+
+        address.setId(student.getId());
+        student.setAddress(address);
+        session.save(student);
+
+        List<Student> students = (List<Student>) session.createQuery("from Student ").list();
+        for (Student s : students) {
+            System.out.println("Details : " + s);
+        }
+
+        session.getTransaction().commit();
+        session.close();
+
+        HibernateUtil.getSessionFactory().close();
+    }
+
+}
